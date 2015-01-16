@@ -1,0 +1,109 @@
+#+STARTUP: indent
+
+* webppl learning
+
+no =for= loops
+
+can't pass in functions as args to external libraries
+
+* sequence models more generally
+
+"it is common, for instance, to have a sequence of observations that we believe was each generated from the same causal process: a sequence of coin flips, a series of temperature readings from a weather station, the words in a sentence"
+
+* markov model
+
+idea: preface the learning version of markov and hidden markov by showing very short more abstract versions of these models. the most likely failure mode is that it will be too much too quickly.
+
+motivation: autocomplete
+
+andreas: if they tried this with real data, you would need to different inference strategies; particle filter would likely fail. in fact, the way you typically train markov models is just closed form solution: transition probabilities are empirical frequencies. what probabilistic programming adds here is that it makes clear the story behind how your data arise.    
+
+* hmm
+
+motivation: part of speech tagging (a rough way to understand a sentence)
+
+i wrote a conditioning function for latent-observed pairs, but even when conditioning 30x on my data, i'm still getting unstable results, even when just a single state is unknown
+
+decided to fix the emission probabilities and just learn transitions, using "the old man the fort" as the query thing
+
+* pcfg
+
+"i saw the man with binoculars"
+
+draw diagram that shows
+
+#+BEGIN_EXAMPLE
+mm \subset hmm \subset pcfg
+#+END_EXAMPLE
+
+found source for parse trees of "john saw the man with binoculars": http://ling.umd.edu/labs/acquisition/papers/hb_final_lidz.pdf
+
+(asked erin what v' (actually, overline{v}) is. seems like it's somewhere between VP and V. you can't nest VP inside V'.)
+
+wrote unfold to return a tree as output
+
+decided against copying the preterminal/terminal approach in dippl. we can incrementally factor using the unfold approach if we add a trueyield argument and rewrite unfold to consume this argument by using reduce rather than map.
+--> an hour or so later, i've gone off into the weeds about tree-unfolds and functional zippers. table this for now.
+
+andreas: don't spend too much time on this
+
+now, i'll try a hack where i keep the remaining yield in globalStore.
+
+because i got some weird errors (it looked like globalStore wasn't properly being defined), i ended up switching to a hand-rolled state library. i think this ended up being unnecessary, though, because globalStore actually was being set, it's just that because of cps (i think), the print statements made it look like it wasn't.
+
+ran into a problem with enumeration not bottoming out (even in breadth first). tried making the grammar finite. this ran into combinatorial issues.
+
+also, had to fix a bug where the unfold would consider perfect any valid prefix of the desired string (had to factor after the unfold if there are any words left).
+
+switched to particle filter and got it working.
+
+* computer vision
+
+wraps around paper.js library
+
+q: third argument to Draw is what?
+
+q: what does the default box line-drawing example do:
+- just shows you the final generation of 100 particles
+
+  to show the evolution across the 4 generations with 11 particles, do:
+
+  #+BEGIN_SRC js2
+  var targetImage = Draw(50, 50, false);
+loadImage(targetImage, "/assets/img/box.png")
+
+var drawLines = function(drawObj, lines){
+  var line = lines[0];
+  drawObj.line(line[0], line[1], line[2], line[3]);
+  if (lines.length > 1) {
+    drawLines(drawObj, lines.slice(1));
+  }
+}
+
+var makeLines = function(n, lines, prevScore){
+  // Add a random line to the set of lines
+  var x1 = randomInteger(50);
+  var y1 = randomInteger(50);
+  var x2 = randomInteger(50);
+  var y2 = randomInteger(50);
+  var newLines = lines.concat([ [x1, y1, x2, y2] ]);
+  // Compute image from set of lines
+  var generatedImage = Draw(50, 50, true);
+  drawLines(generatedImage, newLines);
+  // Factor prefers images that are close to target image
+  var newScore = -targetImage.distance(generatedImage)/1000; // Increase to 10000 to see more diverse samples
+  factor(newScore - prevScore);
+  //generatedImage.destroy();
+  drawLines( generatedImage, newLines);
+  // Generate remaining lines (unless done)
+  return (n==1) ? newLines : makeLines(n-1, newLines, newScore);
+}
+
+ParticleFilter(
+  function(){
+    var lines = makeLines(4, [], 0);
+    //var finalGeneratedImage = Draw(50, 50, true);
+   }, 11)
+  #+END_SRC
+
+the computer vision examples don't currently work well enough to be impressive
