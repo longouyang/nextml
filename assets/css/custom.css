@@ -1,0 +1,75 @@
+
+/* Code boxes */
+
+.CodeMirror {
+   height: auto!important;
+}
+
+pre {
+   border: none;
+   background-color: #fff;
+   white-space: pre-wrap;
+}
+
+.CodeMirror, .resultDiv {
+   border: 1px solid #ccc;
+   border-radius: 4px;
+   padding: .5em;
+   background-color: #fafafa;
+   margin-bottom: .5em;
+   font-size: 13px;
+   font-family: monospace;
+}
+
+.resultDiv {
+   display: none;
+   max-height: 500px;
+   overflow: scroll;
+   margin-top: .5em;
+}
+
+.drawCanvas {
+   border: 1px solid #ccc;
+   border-radius: 4px;
+   padding: .5em;
+   margin-bottom: .5em;
+   margin-right: .5em;
+   margin-top: .5em;
+}
+
+p code, li code {
+   color: #333;
+   background-color: #fafafa;
+   border: 1px solid #dcdcdc;
+   border-radius: 4px;
+   padding: 1px;
+   padding-left: 3px;
+   padding-right: 3px;
+}
+
+/* Bar chart */
+
+svg.barChart {
+   display: block;
+   background-color: #fff;
+   border: 1px solid #ccc;
+   margin: 1em auto;
+   width: 590px;
+   height: 340px;
+}
+
+rect.dimple-bar {
+   fill: #357594;
+   stroke: #224E61;
+}
+
+
+/* Lists */
+
+div.container ul {
+   margin-bottom: 1em;
+}
+
+button:disabled {
+    opacity: 0.5
+}
