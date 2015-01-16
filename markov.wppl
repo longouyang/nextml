@@ -1,0 +1,90 @@
+/* global dirichlet, repeat, discrete, map, _ */ 
+
+var vocab = "^ $ factory 500 cookie fortune".split(" ");
+var n = vocab.length;
+
+var dirichletParams = repeat(n - 1, function() { return 1 });
+
+var model = function() {
+
+    // transition matrix: represented as dictionary
+    // a key is a single vocab word; its corresponding value
+    // is an array of transition probabilities
+    var T = _.object(map(
+        function(w) {
+            // don't need to worry about transitions for $
+            if (w == "$") {
+                return [w, []];
+            }
+
+            // prevent transitions to ^ 
+            return [w, [0].concat(dirichlet(dirichletParams))]; 
+
+        },
+        vocab));
+
+    // given a current word, sample the next word
+    var transition = function(word) {
+        var probs = T[word];
+        return vocab[discrete( probs )];
+    }
+
+    // based on the last entry in a list of words,
+    // use the transition function to append a next word
+    var _predict = function(words) {
+        var prevWord = _.last(words);
+
+        if (prevWord == "$") {
+            return words;
+        }
+
+        return _predict(words.concat(transition(prevWord))); 
+    }
+
+    // convenience method for predicting
+    var predict = function(string) {
+        return _predict(("^ " + string).split(" "))
+            .join(" ")
+            .replace("^","")
+            .replace("$","");
+    }
+
+    var _observe = function(wordsLeft, wordsSoFar) {
+        var prevWord = _.last(wordsSoFar);
+        var nextWord = wordsLeft[0];
+        if (wordsLeft.length == 0 | prevWord == "$") {
+            return wordsSoFar;
+        } 
+
+        // sample the next word
+        var sampledNextWord = transition(prevWord);
+
+        factor(sampledNextWord == nextWord ? 0 : -Infinity);
+        
+        return _observe(wordsLeft.slice(1), wordsSoFar.concat(sampledNextWord));
+    }
+
+    var observe = function(string) {
+        var words = (string + " $").split(" ");
+
+        return _observe(words, ["^"]) // don't have to observe ^
+            .join(" ")
+            .replace("^","")
+            .replace("$","");
+    }
+
+  repeat(5, function() {
+    observe("fortune cookie");
+    observe("fortune cookie");
+    observe("fortune cookie factory");
+    observe("fortune cookie factory");
+    observe("fortune cookie factory");
+    observe("fortune 500");
+  });
+
+  return predict("cookie").split(" ").slice(0, 4).join(" ")
+};
+
+var samps = ParticleFilter(model, 200);
+
+samps;
