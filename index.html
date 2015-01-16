@@ -1,0 +1,24 @@
+---
+layout: default
+---
+
+<div class="home">
+
+  Examples of probabilistic programming applications for the Next.ML workshop.<br />
+  January 17, 2015<br />
+  Long Ouyang<br />
+  
+
+  {% assign sorted_pages = site.pages | sort:"order" %}
+
+  <ul class="post-list">
+    {% for page in sorted_pages %}
+      <li>
+        <a class="post-link" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
+        <span class="post-meta">{{ page.desc }}</span>
+        
+      </li>
+    {% endfor %}
+  </ul>
+
+</div>
