@@ -258,7 +258,7 @@ MH(
     var finalGeneratedImage = Draw(50, 50, showOutputImage);
 
     drawLines(finalGeneratedImage, lines);
-    var newScore = -targetImage.distance(finalGeneratedImage)/1000; // Increase to 10000 to see more diverse samples
+    var newScore = -targetImage.distance(finalGeneratedImage)/700; // Increase to 10000 to see more diverse samples
     factor(newScore);
     
     if (!showOutputImage) {
@@ -268,7 +268,7 @@ MH(
     counter.push(1);
     
     return lines
-   }, 2500);
+   }, 3400);
 
 // show target image for comparison
 loadImage(Draw(50, 50, true), "/assets/img/beach.png")
