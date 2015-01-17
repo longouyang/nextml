@@ -38,7 +38,7 @@ function jsPrint(x){
   }
 }
 
-function hist(store, s, k, lst) {
+function hist(s, k, a, lst) {
   var resultDiv = $(activeCodeBox.parent().find(".resultDiv"));
   var frequencyDict = _(lst).countBy(function(x) { return x + ""});
   var labels = _(frequencyDict).keys();
@@ -234,7 +234,7 @@ function foldCode(cm){
 
 function setupCodeBox(element){
   var $element = $(element);
-  var $code = $element.html();
+  var $code = $element.html().trim();
   var $unescaped = $('<div/>').html($code).text();
 
   $element.empty();
@@ -290,12 +290,15 @@ function setupCodeBox(element){
       
       eval.call(window, compiled); 
 
-    // } catch (err) {
-    //   resultDiv.show();
+    } catch (err) {
+      activeCodeBox.parent().find("button:disabled").text("run").prop("disabled", false);
+      resultDiv.append("<span style='color: red; font-weight: bold'>Error</span>\n" + err.stack).show();
     //   resultDiv.append(document.createTextNode((err.stack)));
       // throw err;
     } finally {
 
+      
+      
       
       
       // topK = oldTopK;
