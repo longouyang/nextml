@@ -1,19 +1,21 @@
 ---
-layout: default
+layout: page
 title: Markov models
 order: 1
 desc: Sentences are chains. We complete each others' sandwiches.
 ---
 
-# Motivating example
+<center><img src="{{ site.baseurl}}/assets/img/markov.png" style='width: 50%;' /></center>
 
-talk about sequences, very quickly mention idea of autocomplete, show google screenshot
+Sequences are all over the place.
+Football games are a sequence of plays, DNA is a sequence of amino acids, and sentences are sequences of words.
+Having a probabilistic model of how sequences arise can allow you to predict elements that haven't seen yet.
+For example:
 
-# Intuition
+<img src='{{site.baseurl}}/assets/img/autocomplete.png' style='width: 30%; border: 1px solid black' /><br />
+*Autocomplete, helping us ask the most important questions first.*
 
-assume that the object of interest (e.g., string of words) is a sequence where the current item depends only 
-
-TODO: picture
+Markov models assume that all you need to know to predict an element sequence is which element came before it.
 
 # Sampling from the discrete distribution
 

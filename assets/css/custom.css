@@ -5,6 +5,10 @@
    height: auto!important;
 }
 
+.post-title {
+    text-align: center
+}
+
 pre {
    border: none;
    background-color: #fff;

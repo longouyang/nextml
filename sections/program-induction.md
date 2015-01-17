@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 title: Program induction
 desc: Hallucinating programs from data.
 order: 3

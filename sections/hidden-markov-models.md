@@ -1,17 +1,16 @@
 ---
-layout: default
+layout: page
 title: Hidden Markov models
 desc: Sentences are fences. Is "man" a verb or a noun?
 order: 2
 ---
 
-TODO: picture
+<center><img src="{{ site.baseurl}}/assets/img/hidden-markov.png" style='width: 50%;' /></center>
 
-# TODO: motivation, picture
-
-part-of-speech tagging
-
-
+Markov models allow us to make predictions about elements in a sequence.
+Hidden Markov models (HMMs) generalize Markov models by positing that each of these elements has some hidden attributes, which we should be able to reason about.
+For instance, people typically perform actions for a reason (e.g., John went to get a drink with friends because he was happy).
+Typically, as observers, we see these *actions* but not their underlying *causes*; HMMs allow us to make inferences about them.
 
 # Sampling from an HMM
 

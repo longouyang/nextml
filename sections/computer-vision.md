@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 title: Computer vision as inverse graphics
 desc: Compression on steroids. 
 order: 4
