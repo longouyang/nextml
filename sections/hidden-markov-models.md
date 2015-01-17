@@ -208,12 +208,12 @@ var model = function() {
         var sampledNextState = transition(prevPair.state);
 
         factor(nextState == "?" ? 0 :
-               (sampledNextState == nextState ? 0 : -Infinity));
+               (sampledNextState == nextState ? 0 : -30));
         
         var nextWord = pairsLeft[0].word; 
         var sampledNextWord = emit(sampledNextState);
 
-        factor(sampledNextWord == nextWord ? 0 : -Infinity); 
+        factor(sampledNextWord == nextWord ? 0 : -10); 
         
         return _observePairs(pairsLeft.slice(1), pairsSoFar.concat({state: sampledNextState,
                                                                     word: sampledNextWord
