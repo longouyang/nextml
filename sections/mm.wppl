@@ -59,7 +59,7 @@ var model = function() {
         // sample the next word
         var sampledNextWord = transition(prevWord);
 
-        factor(sampledNextWord == nextWord ? 0 : -Infinity);
+        factor(sampledNextWord == nextWord ? 0 : -100);
         
         return _observe(wordsLeft.slice(1), wordsSoFar.concat(sampledNextWord));
     }
@@ -73,18 +73,17 @@ var model = function() {
             .replace("$","");
     }
 
-  repeat(5, function() {
-    observe("fortune cookie");
-    observe("fortune cookie");
-    observe("fortune cookie factory");
-    observe("fortune cookie factory");
-    observe("fortune cookie factory");
-    observe("fortune 500");
-  });
+  
+  observe("fortune cookie");
+  observe("fortune cookie");
+  observe("fortune cookie factory");
+  observe("fortune cookie factory");
+  observe("fortune cookie factory");
+  observe("fortune 500");
 
-  return predict("cookie").split(" ").slice(0, 4).join(" ")
+  return predict("cookie").split(" ").slice(0, 3).join(" ")
 };
 
-var samps = ParticleFilter(model, 200);
+var samps = ParticleFilter(model, 5000);
 
 samps;
