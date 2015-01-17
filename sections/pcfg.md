@@ -7,10 +7,61 @@ order: 2.5
 
 <center><img src="{{ site.baseurl}}/assets/img/pcfg.png" style='width: 50%;' /></center>
 
+Whereas HMMs assume that sequence elements are generated from hidden variables organized in a flat linear structure, PCFGs assume that the hidden variables can be organized hierarchically.
+This allows for richer representations.
+For instance, an HMM would have a hard time with the sentence:
+
+> Joan saw the big old scary man with binoculars.
+
+Here, there are two possible readings (either Joan has the binoculars or the man does) but an HMM would have a hard time capturing this because the information involved in this inference is so far apart; "Joan" is at the beginning of the sentence and "with binoculars" is at the end.
+
+# Sampling from a PCFG
 
 ~~~
-/* global map, _, randomInteger, reduce, globalStore, factor */
+// extract words from a single string
+// assumes that whitespace is the delimiter
+var w = function(string) {
+  return string.split(/ +/);
+}
 
+var grammar = {
+  "S":  map(w, ["x OP S", "S OP x", "N"]),
+  "OP": map(w, ["+", "-", "*"]),
+  "N":  map(w, ["0", "1", "2", "3", "4", "5", "6"])
+};
+
+var isTerminal = function(symbol) {
+  return !(_.contains(["S","OP","N"], symbol))
+}
+
+var unfold = function(symbol) {
+  if (isTerminal(symbol)) {
+    return symbol
+  }
+  
+  var rules = grammar[symbol];
+  var sampledRule = rules[ randomInteger(rules.length) ];
+  
+  return [symbol].concat( map(unfold, sampledRule) );
+}
+
+var reformatTree = function(x) {
+  if (Array.isArray(x)) {
+    return "[" + map(reformatTree, x).join(" ") + "]"
+  }
+  return x
+}
+
+repeat(5,
+       function() { return reformatTree(unfold("S")) })
+~~~
+
+(Plug in the output of reformatTree to [Miles Shang's syntax tree generator](http://mshang.ca/syntree/) for visualization)
+
+
+# Application: parsing ambiguous sentences
+
+~~~
 /*
 
  S -> NP VP
@@ -20,16 +71,6 @@ order: 2.5
  PP -> P NP
  
  */
-
-// extract words from a single string
-// assumes that whitespace is the delimiter
-var w = function(string) {
-  return string.split(/ +/);
-}
-
-var mapw = function(arrayOfStrings) {
-  return map(w, arrayOfStrings);
-}
 
 var grammar = {
   "S":  map(w, ["NP VP"]),
@@ -94,7 +135,7 @@ var _unfold = function(symbol) {
 
   var sampledRewrite = rules[ randomInteger(rules.length) ];
 
-  return [symbol].concat(map(function(x) { return _unfold(x) }, sampledRewrite));
+  return [symbol].concat(map(_unfold, sampledRewrite));
 
 };
 
@@ -102,14 +143,22 @@ var unfold = function() {
   return _.flatten(_unfold("S")).join(" ");
 }
 
-ParticleFilter(function() {
+var erp = ParticleFilter(function() {
   globalStore.yieldLeft = "Joan saw the man with binoculars".split(" ");
   
   var x = _unfold("S");
 
   factor(globalStore.yieldLeft.length == 0 ? 0 : -Infinity);
 
-  return JSON.stringify(x);
+  return x;
 }, 1000);
 
+var reformatTree = function(x) {
+  if (Array.isArray(x)) {
+    return "[" + map(reformatTree, x).join(" ") + "]"
+  }
+  return x
+}
+
+reformatTree( sample(erp) )
 ~~~
