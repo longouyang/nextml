@@ -77,3 +77,9 @@ div.container ul {
 button:disabled {
     opacity: 0.5
 }
+
+/* quotes */
+
+blockquote {
+    font-family: Times New Roman
+}
