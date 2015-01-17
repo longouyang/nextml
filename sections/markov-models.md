@@ -5,18 +5,21 @@ order: 1
 desc: Sentences are chains. We complete each others' sandwiches.
 ---
 
-# intuition
+# Motivating example
+
+talk about sequences, very quickly mention idea of autocomplete, show google screenshot
+
+# Intuition
 
 assume that the object of interest (e.g., string of words) is a sequence where the current item depends only 
 
 TODO: picture
 
-# sampling from the discrete distribution
+# Sampling from the discrete distribution
 
 Taking a single sample:
 
 ~~~~
-var words = ["^", "complete", "the", "sandwich", "sentence", "$"];
 discrete([1/6, 2/6, 1/6, 1/6, 0.5/6, 0.5/6])
 ~~~~
 
@@ -32,11 +35,19 @@ Using samples from `discrete` to access elements of an array of words:
 
 ~~~~
 var words = ["^", "complete", "the", "sandwich", "sentence", "$"];
-repeat(10,
-       function() { return words[ discrete([1/6, 2/6, 1/6, 1/6, 0.5/6, 0.5/6])] })
+words[ discrete([1/6, 2/6, 1/6, 1/6, 0.5/6, 0.5/6]) ]
 ~~~~
 
-# transitioning from one word to another
+Word salad: building sentences just by `repeat`ing calls to `discrete`.
+
+~~~~
+repeat(10,
+       function() { return words[ discrete([1/6, 2/6, 1/6, 1/6, 0.5/6, 0.5/6]) ] }).join(" ")
+~~~~
+
+These are awful sentences! Note the predominance of the more frequent words.
+
+# Transitioning from one word to another
 
 Defining a transition matrix:
 
@@ -62,7 +73,7 @@ var transition = function(word) {
 }
 ~~~~
 
-# recursively transitioning to build up a sentence
+# Recursively transitioning to build up a sentence
 
 ~~~~
 var _sampleSentence = function(wordsSoFar) {
@@ -84,13 +95,25 @@ var sampleSentence = function() {
 hist(repeat(1000, sampleSentence))
 ~~~~
 
-# application: predicting the next part of the sentence (autocomplete)
+# Application: predicting the next part of the sentence (autocomplete)
 
 ~~~~
-//todo
+var predictNextPart = function(prefix) {
+  var words = prefix.split(" ");
+  var lastWordOfPrefix = _.last(words);
+  // q: why don't you need to seed the chain with the last word of the prefix?
+  // why not the *entire* prefix?
+  return _sampleSentence([lastWordOfPrefix]).slice(1,-1).join(" ");
+}
+
+repeat(10, function() { return predictNextPart("complete the") })
 ~~~~
 
-# application: learning the autocomplete transition probabilities from a corpus
+# Application: learning the autocomplete transition probabilities from a corpus
+
+for large applications, it's infeasible to declare the transition matrix by hand. you want to learn it from data.
+
+(we're using dirichlet as a distribution on distributions)
 
 ~~~~
 var vocab = "^ $ factory 500 cookie fortune".split(" ");
@@ -152,7 +175,7 @@ var model = function() {
         // sample the next word
         var sampledNextWord = transition(prevWord);
 
-        factor(sampledNextWord == nextWord ? 0 : -Infinity);
+        factor(sampledNextWord == nextWord ? 0 : -100);
         
         return _observe(wordsLeft.slice(1), wordsSoFar.concat(sampledNextWord));
     }
@@ -166,19 +189,18 @@ var model = function() {
             .replace("$","");
     }
 
-  repeat(5, function() {
-    observe("fortune cookie");
-    observe("fortune cookie");
-    observe("fortune cookie factory");
-    observe("fortune cookie factory");
-    observe("fortune cookie factory");
-    observe("fortune 500");
-  });
+  
+  observe("fortune cookie");
+  observe("fortune cookie");
+  observe("fortune cookie factory");
+  observe("fortune cookie factory");
+  observe("fortune cookie factory");
+  observe("fortune 500");
 
-  return predict("cookie").split(" ").slice(0, 4).join(" ")
+  return predict("cookie").split(" ").slice(0, 3).join(" ")
 };
 
-var samps = ParticleFilter(model, 200);
-
-print(samps);
+print(ParticleFilter(model, 5000));
 ~~~~
+
+(Talk about closed form solution for max-likelihood transition params; PPL as a prototyping tool.)

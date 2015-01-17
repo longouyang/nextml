@@ -5,6 +5,124 @@ desc: Sentences are fences. Is "man" a verb or a noun?
 order: 2
 ---
 
+TODO: picture
+
+# TODO: motivation, picture
+
+part-of-speech tagging
+
+
+
+# Sampling from an HMM
+
+~~~~
+var states = "happy sad".split(" ");
+
+var activities = "work commute exercise drink date sleep eat facebook".split(" ");
+
+// transition matrix
+var T = {
+  // current    probability of next state:
+  // state       happy  sad
+     happy:     [0.7,   0.3],
+     sad:       [0.3,   0.7]
+};
+
+// emission matrix
+var E = {
+  //                   probability of activity for state:
+  // stat     work  commute exercise drink date  sleep  eat  facebook
+     happy:  [9/24, 1/24,   1/24,    1/24, 1/24, 8/24,  2/24, 1/24],
+     sad:    [2/24, 1/24,   0/24,    4/24, 0/24, 10/24, 2/24, 5/24]
+  // this isn't autobiographical! who said that?!
+};
+
+// given a state, sample the next state
+var transition = function(state) {
+  var probs = T[state];
+  var sampledIndex = discrete(probs)
+  return states[sampledIndex];
+}
+
+// given a state, sample a corresponding activity
+var emit = function(state) {
+  var probs = E[state];
+  var sampledIndex = discrete(probs)
+  return activities[sampledIndex] 
+}
+
+var _sampleSequence = function(n, sequenceSoFar) {
+  if (n == 0) {
+    return sequenceSoFar
+  }
+  
+  var prevState = _.last(sequenceSoFar).state
+  var nextState = transition(prevState)
+  
+  var nextActivity = emit(nextState)
+  
+  return _sampleSequence(n - 1,
+                         sequenceSoFar.concat({state: nextState,
+                                               activity: nextActivity}));
+}
+
+// wrapper around _sampleSequence
+var sampleSequence = function(n) {
+  // get the chain started by using a random seed state
+  // , which is 70% likely to be happy
+  var seedState = {state: flip(0.5) ? "happy" : "sad"};
+  
+  return _sampleSequence(n, [seedState]).slice(1) // remove seed state;
+}
+
+var arrayEqual = function(x, y) {
+  return _.all(map(function(pair) { return pair[0] == pair[1] },
+                   _.zip(x,y)))
+}
+~~~~
+
+Predicting activities from states:
+
+~~~~
+print(Enumerate(function() {
+  var seq = sampleSequence(3);
+  
+  var states = _.pluck(seq, "state");
+  var activities = _.pluck(seq, "activity");
+  
+  factor( arrayEqual(states,
+                     ["happy", "happy", "happy"]
+                     // ["sad", "sad", "sad"]
+                    )  ? 0 : -Infinity)
+  
+  return activities.join(" ")
+  
+}, 100))
+~~~~
+
+But we didn't really need probabilistic programming for this... Let's try the reverse question, which *does* require probabilistic programming: predicting states from activities.
+
+~~~~
+print(Enumerate(function() {
+  var seq = sampleSequence(3);
+  
+  var states = _.pluck(seq, "state");
+  var activities = _.pluck(seq, "activity");
+  
+  factor( arrayEqual(activities,
+                     ["facebook", "facebook","facebook"]
+                     //["commute","commute","commute"]
+                     //["drink","exercise","date"]
+                    )  ? 0 : -Infinity)
+  
+  return states.join(" ")
+}))
+~~~~
+
+Shortcoming of model: activities can influence states (e.g., exercising, drinking). Could address easily with PPL. 
+
+# Application: part-of-speech tagging
+
 ~~~
 var states = "_start noun verb det adj".split(" ");
 var M = states.length; 
@@ -161,7 +279,5 @@ var model = function() {
     
 };
 
-var samps = ParticleFilter(model, 1000);
-
-samps;
+print(ParticleFilter(model, 1000));
 ~~~

@@ -278,29 +278,31 @@ function setupCodeBox(element){
     topK = function(s, x){
       _trampoline = null;
       showResult(s, x);
-      activeCodeBox.parent().find("button:disabled").text("run").prop("disabled", false);
+      //activeCodeBox.parent().find("button:disabled").text("run").prop("disabled", false);
       topK = oldTopK; };
     activeCodeBox = $element;
     activeCodeBox.parent().find("canvas").remove();
     activeCodeBox.parent().find(".resultDiv").text("");
     try {
+      activeCodeBox.state = "compiling"; 
       var compiled = webppl.compile(cm.getValue(), false);
 
+      activeCodeBox.state = "running";
+
       activeCodeBox.parent().find("button:disabled").text("running...");
-      
-      eval.call(window, compiled); 
+
+      eval.call(window, compiled)
 
     } catch (err) {
-      activeCodeBox.parent().find("button:disabled").text("run").prop("disabled", false);
+      // var _timerId_ = setInterval(function() {
+      //   debugger;
+      //   clearInterval( _timerId_ );
+      //   activeCodeBox.parent().find("button:disabled").text("run").prop("disabled", false) },
+      //            100);
       resultDiv.append("<span style='color: red; font-weight: bold'>Error</span>\n" + err.stack).show();
     //   resultDiv.append(document.createTextNode((err.stack)));
       // throw err;
     } finally {
-
-      
-      
-      
-      
       // topK = oldTopK;
       // activeCodeBox = oldActiveCodeBox;
 
@@ -333,11 +335,11 @@ function setupCodeBox(element){
         var button = this;
         var isJavascript = (getLanguage() == "javascript");
         
-        $(this).prop("disabled",true).text(isJavascript ? "running..." : "compiling...");
+        //$(this).prop("disabled",true).text(isJavascript ? "running..." : "compiling...");
         
-        setTimeout(function() {
+        //setTimeout(function() {
           (getLanguage() == "javascript") ? runJS() : runWebPPL();
-        }, 50);
+      //}, 50);
 
 
       }
