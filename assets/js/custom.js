@@ -290,12 +290,15 @@ function setupCodeBox(element){
       
       eval.call(window, compiled); 
 
-    // } catch (err) {
-    //   resultDiv.show();
+    } catch (err) {
+      activeCodeBox.parent().find("button:disabled").text("run").prop("disabled", false);
+      resultDiv.append("<span style='color: red; font-weight: bold'>Error</span>\n" + err.stack).show();
     //   resultDiv.append(document.createTextNode((err.stack)));
       // throw err;
     } finally {
 
+      
+      
       
       
       // topK = oldTopK;
