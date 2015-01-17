@@ -72,6 +72,10 @@ repeat(5,
  
  */
 
+var w = function(string) {
+  return string.split(/ +/);
+}
+
 var grammar = {
   "S":  map(w, ["NP VP"]),
   "NP": map(w, ["N", "D N", "D N PP"]),
@@ -84,6 +88,7 @@ var grammar = {
   "D":  map(w, ["the"]) 
 };
 
+// get the leaves of a parse tree
 var getLeaves = function(x) {
   if (x.length > 1) {
     return reduce(function(x, acc) { return getLeaves(x).concat(acc)},
@@ -94,47 +99,48 @@ var getLeaves = function(x) {
   return [ x[0] ]
 }
 
+var reformatTree = function(x) {
+  if (Array.isArray(x)) {
+    return "[" + map(reformatTree, x).join(" ") + "]"
+  }
+  return x
+}
+
 var preTerminals = ["P", "N", "V", "D"];
 var terminals = _.flatten(map(function(x) { return grammar[x]},
                               ["P", "N", "V", "D"]
                              ));
 
-var isTerminal = function(x) {
-  return _.contains(terminals, x);
+// is a symbol a terminal?
+var isTerminal = function(symbol) {
+  return _.contains(terminals, symbol);
 }
 
+// is a symbol a pre-terminal?
+// i.e., does it only rewrite to terminals?
 var isPreTerminal = function(symbol) {
   return _.contains(["P","N","V","D"], symbol);
 }
 
+// rewrite a preterminal to a terminal
 var samplePreTerminal = function(symbol) {
   var rules = grammar[symbol];
   return rules[ randomInteger(rules.length) ];
 }
 
-// trueYield is an array
 var _unfold = function(symbol) {
-  
   var yieldLeft = globalStore.yieldLeft;
-
   if (yieldLeft.length == 0) {
     factor(-Infinity);
   }
-  
   if (isPreTerminal(symbol)) {
     var terminal = samplePreTerminal(symbol);
-
     factor(terminal == yieldLeft[0] ? 0 : -Infinity);
-
     globalStore.yieldLeft =  yieldLeft.slice(1);
-    
     return [symbol, terminal];
   }
-
   var rules = grammar[symbol];
-
   var sampledRewrite = rules[ randomInteger(rules.length) ];
-
   return [symbol].concat(map(_unfold, sampledRewrite));
 
 };
@@ -145,20 +151,10 @@ var unfold = function() {
 
 var erp = ParticleFilter(function() {
   globalStore.yieldLeft = "Joan saw the man with binoculars".split(" ");
-  
   var x = _unfold("S");
-
   factor(globalStore.yieldLeft.length == 0 ? 0 : -Infinity);
-
   return x;
 }, 1000);
-
-var reformatTree = function(x) {
-  if (Array.isArray(x)) {
-    return "[" + map(reformatTree, x).join(" ") + "]"
-  }
-  return x
-}
 
 reformatTree( sample(erp) )
 ~~~
