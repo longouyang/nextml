@@ -6,7 +6,7 @@ order: 3
 ---
 
 We will use a PCFG and conditional reasoning to infer a program given examples of its input-output behavior.
-In our generative model, we use a PCFG to sample the source code of an candidate programs.
+In our generative model, we use a PCFG to sample the source code of candidate programs.
 The probability of sampling a program gives a measure of its complexity -- roughly speaking, more likely programs are less complex.
 We then use `factor` to weight programs according to how well they explain a training set of input-output pairs.
 We will end up preferring programs that have the best balance of complexity and explanatory power.
