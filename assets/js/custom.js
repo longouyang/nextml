@@ -234,7 +234,7 @@ function foldCode(cm){
 
 function setupCodeBox(element){
   var $element = $(element);
-  var $code = $element.html();
+  var $code = $element.html().trim();
   var $unescaped = $('<div/>').html($code).text();
 
   $element.empty();
