@@ -7,57 +7,70 @@ order: 0
 
 ~~~
 var sampleAttributes = function() {
-  // sample skill from a gaussian and constrain it to lie in [0, 100]
-  var skill = Math.min(Math.max(gaussian(50,10), 0), 100);
+  var skill = randomInteger(11);
 
   // compute performance variability.
   // variability goes down as skill increases
   // 
   // variability
   //
-  //     |
   //     |*
   //     | *
   //     |  *
   //     |   *
   //     |____*____ skill
   //
-  var variability = 0.05 * (110 - skill);
+  var variability = Math.round(0.2 * (11 - skill));
   
-
   return {skill: skill,
-          variability: variability
-                  };
-  
+          variability: variability};
 }
 
-// returns true if x wins
-var match = function(x,y) {
-  var performanceX = x.skill + gaussian(0, x.variability);
-  var performanceY = y.skill + gaussian(0, y.variability);
+var performance = function(p) {
+  return p.skill + randomInteger(2 * p.variability) - p.variability;
+}
 
-  return (performanceX > performanceY);
+var beats = function(p1, p2) {
+  var perf1 = performance(p1);
+  var perf2 = performance(p2);
+  
+  if (perf1 == perf2) {
+    // coin flip
+    factor(Math.log(0.5))
+  }
+  
+  factor(perf1 > perf2 ? 0 : -Infinity)
 }
 
 var know = function(bool) {
   factor(bool ? 0 : -Infinity);
 }
 
-print(MH(function() {
+var compare = function(p1, p2) {
+  if (p1.skill == p2.skill) {
+    return "A = B";
+  }
+  if (p1.skill > p2.skill) {
+    return "A > B";
+  }
+  return "A < B";
+}
+
+print(Enumerate(function() {
   
   var alice = sampleAttributes();
-  
   var bob = sampleAttributes();
   
-  var numMatches = 30;
+  beats(alice, bob)
   
-  var numAliceWins = filter(function(x) { return x },
-                            repeat(numMatches, function() { return match(alice, bob) })).length;
+  return alice.skill
   
   
-  know( numAliceWins == 0 )
-  
-  return [Math.round( alice.skill ) ]
-  
-  }, 1000))
+  }, 5000))
 ~~~
+
+other settings:
+
+- how likely is it that alice is better than bob if they've each beaten each other once?
+    - what if she has beaten him 2/2 times?
+- how does our inference about alice's skill change as we see more observations of her winning?
