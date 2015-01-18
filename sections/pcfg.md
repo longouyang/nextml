@@ -58,7 +58,6 @@ repeat(5,
 
 (Plug in the output of reformatTree to [Miles Shang's syntax tree generator](http://mshang.ca/syntree/) for visualization)
 
-
 # Application: parsing ambiguous sentences
 
 ~~~
@@ -158,3 +157,5 @@ var erp = ParticleFilter(function() {
 
 reformatTree( sample(erp) )
 ~~~
+
+(Plug in the output of reformatTree to [Miles Shang's syntax tree generator](http://mshang.ca/syntree/) for visualization)
