@@ -1,3 +1,4 @@
 # Build settings
 markdown: kramdown
 baseurl: /nextml
+exclude: ["README.md"]
