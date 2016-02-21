@@ -47,20 +47,20 @@ Loading images:
 
 ~~~~
 var myDraw1 = Draw(200, 200, true);
-loadImage(myDraw1, "/assets/img/the_scream.jpg");
+loadImage(myDraw1, "../assets/img/the_scream.jpg");
 
 var myDraw2 = Draw(200, 200, true);
-loadImage(myDraw2, "/assets/img/box.png");
+loadImage(myDraw2, "../assets/img/box.png");
 ~~~~
 
 Computing the pixel-by-pixel distance between two images:
 
 ~~~~
 var myDraw1 = Draw(200, 200, false);
-loadImage(myDraw1, "/assets/img/the_scream.jpg");
+loadImage(myDraw1, "../assets/img/the_scream.jpg");
 
 var myDraw2 = Draw(200, 200, false);
-loadImage(myDraw2, "/assets/img/box.png");
+loadImage(myDraw2, "../assets/img/box.png");
 
 myDraw1.distance(myDraw2);
 ~~~~
@@ -69,14 +69,14 @@ Target image:
 
 ~~~~
 var targetImage = Draw(50, 50, true);
-loadImage(targetImage, "/assets/img/box.png")
+loadImage(targetImage, "../assets/img/box.png")
 ~~~~
 
 Inferring lines that match the target image:
 
 ~~~~
 var targetImage = Draw(50, 50, false);
-loadImage(targetImage, "/assets/img/box.png")
+loadImage(targetImage, "../assets/img/box.png")
 
 var drawLines = function(drawObj, lines){
   var line = lines[0];
@@ -122,7 +122,7 @@ Inference using MCMC and with a model that can manipulate opacity and stroke wid
 ~~~~
 ///fold:
 var targetImage = Draw(50, 50, false);
-loadImage(targetImage, "/assets/img/box.png")
+loadImage(targetImage, "../assets/img/box.png")
 
 var uniformDraw = function(xs){
   var i = randomInteger(xs.length);
@@ -185,7 +185,7 @@ A more colorful target image:
 
 ~~~~
 var targetImage = Draw(50, 50, true);
-loadImage(targetImage, "/assets/img/beach.png")
+loadImage(targetImage, "../assets/img/beach.png")
 ~~~~
 
 A richer image prior:
@@ -193,7 +193,7 @@ A richer image prior:
 ~~~~
 ///fold:
 var targetImage = Draw(50, 50, false);
-loadImage(targetImage, "/assets/img/beach.png")
+loadImage(targetImage, "../assets/img/beach.png")
 
 var uniformDraw = function(xs){
   var i = randomInteger(xs.length);
@@ -271,5 +271,5 @@ MH(
    }, 3400);
 
 // show target image for comparison
-loadImage(Draw(50, 50, true), "/assets/img/beach.png")
+loadImage(Draw(50, 50, true), "../assets/img/beach.png")
 ~~~~
